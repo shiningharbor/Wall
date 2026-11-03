@@ -1,7 +1,7 @@
-import { timingSafeEqual } from "node:crypto";
 import sharp from "sharp";
 import { NextResponse } from "next/server";
 import { getCloudinary, getCloudinaryFolder } from "@/lib/cloudinary";
+import { hasOperatorSession, validOperatorPin } from "@/lib/operator-session";
 import { getAdminFirestore, WALL_DOCUMENT_PATH } from "@/lib/firebase-admin";
 import { LibraryFullError, MAX_LIBRARY_PHOTOS, parsePhotos, registerPhoto } from "@/lib/photo-library";
 
@@ -9,14 +9,6 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const MAX_IMAGE_BYTES = 3 * 1024 * 1024; // Debajo del límite de Vercel (4.5 MB).
-
-function validPin(candidate: string | null): boolean {
-  const expected = process.env.UPLOAD_PIN;
-  if (!expected || !candidate) return false;
-  const a = Buffer.from(expected);
-  const b = Buffer.from(candidate);
-  return a.length === b.length && timingSafeEqual(a, b);
-}
 
 function failure(status: number, error: string) {
   return NextResponse.json({ ok: false, error }, {
@@ -26,7 +18,7 @@ function failure(status: number, error: string) {
 }
 
 export async function POST(request: Request) {
-  if (!validPin(request.headers.get("x-upload-pin"))) {
+  if (!hasOperatorSession(request) && !validOperatorPin(request.headers.get("x-upload-pin"))) {
     return failure(401, "Código de operador incorrecto.");
   }
 
@@ -42,15 +34,15 @@ export async function POST(request: Request) {
     if (image.size === 0 || image.size > MAX_IMAGE_BYTES) {
       return failure(413, "La foto supera los 3 MB permitidos.");
     }
-    if (!["image/jpeg", "image/png", "image/webp"].includes(image.type)) {
-      return failure(415, "Solo se permiten JPEG, PNG y WebP.");
+    if (image.type !== "image/jpeg") {
+      return failure(415, "Solo se permiten fotografías JPG.");
     }
 
     const bytes = Buffer.from(await image.arrayBuffer());
     const metadata = await sharp(bytes).metadata();
     if (!metadata.width || !metadata.height || metadata.width !== metadata.height ||
         metadata.width < 320 || metadata.width > 6000 ||
-        !["jpeg", "png", "webp"].includes(metadata.format || "")) {
+        metadata.format !== "jpeg") {
       return failure(422, "La fotografía debe ser válida, cuadrada (1:1) y de 320 a 6000 px.");
     }
 
@@ -62,9 +54,10 @@ export async function POST(request: Request) {
       return failure(409, `El muro alcanzó el límite de ${MAX_LIBRARY_PHOTOS} fotos.`);
     }
 
-    const mime = metadata.format === "jpeg" ? "image/jpeg" : `image/${metadata.format}`;
     const cloud = getCloudinary();
-    const uploaded = await cloud.uploader.upload(`data:${mime};base64,${bytes.toString("base64")}`, {
+    // El navegador ya entregó un JPG real: no se convierte durante la descarga.
+    const uploaded = await cloud.uploader.upload(`data:image/jpeg;base64,${bytes.toString("base64")}`, {
+      format: "jpg",
       folder: getCloudinaryFolder(),
       resource_type: "image",
       overwrite: false,
@@ -77,7 +70,11 @@ export async function POST(request: Request) {
       createdAt: Date.now(),
     });
 
-    return NextResponse.json({ ok: true, url: photo.url, file: photo.id,
+    // URL DIRECTA del archivo JPG original almacenado en Cloudinary.
+    // El QR debe abrir la imagen, sin transformación ni conversión posterior.
+    const downloadUrl = uploaded.secure_url;
+
+    return NextResponse.json({ ok: true, url: photo.url, downloadUrl, file: photo.id,
       width: uploaded.width, height: uploaded.height }, { status: 201,
       headers: { "Cache-Control": "no-store" } });
   } catch (error) {

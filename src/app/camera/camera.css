@@ -1,0 +1,116 @@
+/* Solo para /camera: el resto del branding de Roche se conserva en globals.css. */
+.studio {
+  justify-content: flex-start;
+  overflow-y: auto;
+  padding-top: max(20px, env(safe-area-inset-top));
+  padding-bottom: max(22px, env(safe-area-inset-bottom));
+}
+
+/* El nuevo muro contiene dos fotos anchas. Con el source cuadrado y
+   object-position 50% 38% quedan visibles aprox. las alturas 16%-73%
+   en el marco mas apaisado. Esta guia deja margen adicional: 20%-69%. */
+.studio .safe-zone {
+  top: 20%;
+  left: 11%;
+  width: 78%;
+  height: 49%;
+  aspect-ratio: auto;
+  transform: none;
+}
+.studio .safe-zone::before { height: 18%; }
+.studio .safe-zone::after { width: 18%; }
+.studio .safe-label { font-size: clamp(9px, 2vw, 11px); }
+
+.camera-login {
+  width: min(100%, 380px);
+  margin: auto 0;
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  border: 1px solid #dae6f4;
+  border-radius: 12px;
+  padding: 28px 22px;
+  box-shadow: 0 12px 44px #123a6814;
+}
+.camera-login p { margin: 0; color: #28517c; text-align: center; font-size: 14px; }
+.camera-login .operator-input,
+.camera-login .shutter { width: 100%; }
+
+.camera-controls {
+  width: min(86vw, 420px);
+  display: grid;
+  gap: 9px;
+  justify-items: stretch;
+}
+.camera-switch {
+  width: 100%;
+  border: 1px solid #a3c2e2;
+  background: #eef5fd;
+  color: #09579c;
+  border-radius: 7px;
+  min-height: 42px;
+  cursor: pointer;
+  padding: 9px 12px;
+  font-size: 14px;
+  font-weight: 650;
+}
+.camera-switch:disabled { opacity: .55; cursor: default; }
+.camera-selector { display: grid; gap: 5px; color: #51687e; font-size: 12px; font-weight: 650; }
+.camera-selector select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #d4dfe8;
+  border-radius: 7px;
+  background: #fff;
+  color: #203d5a;
+  padding: 8px 10px;
+}
+
+.studio--sent .capture-frame {
+  width: min(68vw, 31dvh, 290px);
+  min-width: 0;
+  padding: 7px;
+}
+.camera-result {
+  width: min(90vw, 440px);
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 10px;
+  padding-bottom: 8px;
+}
+.camera-result h2 { color: #0752a1; font-size: 20px; margin: 0; }
+.camera-result p { color: #28517c; margin: 0; font-size: 14px; }
+.camera-qr {
+  display: block;
+  width: min(52vw, 210px);
+  height: auto;
+  aspect-ratio: 1;
+  background: #fff;
+  padding: 7px;
+  border: 1px solid #dfe9f5;
+  border-radius: 7px;
+}
+.camera-result-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.camera-result-links a {
+  border: 1px solid #a3c2e2;
+  padding: 10px 13px;
+  border-radius: 6px;
+  color: #0755a6;
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+}
+.camera-result small { color: #56728d; max-width: 350px; line-height: 1.4; font-size: 12px; }
+.camera-result .shutter { width: min(86vw, 330px); margin-top: 5px; }
+
+@media (max-height: 650px) {
+  .studio { gap: 8px; }
+  .studio--sent .capture-frame { width: min(58vw, 24dvh, 210px); }
+  .camera-qr { width: min(42vw, 165px); }
+}

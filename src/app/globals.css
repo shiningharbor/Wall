@@ -88,3 +88,81 @@ button, input { font: inherit; }
 @media (hover:hover) { .shutter:not(:disabled):hover { background: #17293d; } }
 @media (max-height: 590px) { .studio { gap: 7px; } .capture-frame { width: min(55vw, calc(100dvh - 175px), 380px); padding: 8px; } .shutter { min-height: 45px; } }
 @media (prefers-reduced-motion: reduce) { .photo-image-wall img.photo-entering { transition: none; transform: none; } }
+
+
+
+/* =========================================
+   ROCHE ONCOLOGY - GRID NUEVO
+   10 FOTOGRAFIAS / 6 FILAS
+   ========================================= */
+
+.wall-grid {
+  position: absolute;
+
+  /* Area de fotografias dentro de la puerta */
+  top: 20%;
+  bottom: 12.7%;
+  left: 14%;
+  right: 11%;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  grid-template-rows:
+    minmax(0, 1.3fr)
+    minmax(0, 1.35fr)
+    minmax(0, 1.6fr)
+    minmax(0, 1fr)
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 1.2cqw;
+  z-index: 1;
+}
+
+/* Anular posiciones antiguas */
+.wall-grid > .photo-cell {
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+  bottom: auto;
+
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  aspect-ratio: auto;
+  transform: none;
+}
+
+/* Foto 3: ancho completo */
+.wall-grid > .photo-cell:nth-child(3) {
+  grid-column: 1 / -1;
+}
+
+/* Foto 4: ancho completo */
+.wall-grid > .photo-cell:nth-child(4) {
+  grid-column: 1 / -1;
+}
+
+/* Mantener las fotografias en sus marcos */
+.wall-grid .photo-frame-wall {
+  width: 100%;
+  height: 100%;
+}
+
+.wall-grid .photo-image-wall {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.wall-grid .photo-image-wall img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 38%;
+}

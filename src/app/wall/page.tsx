@@ -48,9 +48,16 @@ export default function PhotoWall() {
 
   return (
     <main className="wall-screen">
-      <section className="photo-wall" aria-label="Collage de fotografías Roche Oncology">
-        {data.images.map((url, index) => <PhotoSlot key={index} url={url} />)}
-      </section>
+      <section
+  className="photo-wall"
+  aria-label="Collage de fotografías Roche Oncology"
+>
+  <div className="wall-grid">
+    {data.images.map((url, index) => (
+      <PhotoSlot key={index} url={url} />
+    ))}
+  </div>
+</section>
       {debug && (
         <aside className="wall-debug" role="status">
           {error ? `Error: ${error}` : `Fotos: ${data.libraryCount} | Última rotación: ${data.lastRandomAt
