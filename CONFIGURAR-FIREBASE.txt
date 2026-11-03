@@ -1,0 +1,21 @@
+ROCHE PHOTO WALL — CORREGIR ERROR 500 DE FIREBASE
+
+El error "Failed to parse private key" ocurre cuando la private_key no es válida o está incompleta.
+
+IMPORTANTE: La clave que se publicó en el chat está comprometida. Revócala y crea una NUEVA en Firebase / Google Cloud. La clave privada NO está incluida en este ZIP.
+
+1. Extrae el ZIP en tu PC.
+2. En Firebase Console, abre proyecto revolverx-50c19 > Configuración > Cuentas de servicio > Generar nueva clave privada.
+3. Guarda el JSON descargado en: secrets/firebase-service-account.json
+4. Copia .env.example como .env.local.
+5. Revisa que FIREBASE_SERVICE_ACCOUNT_PATH=./secrets/firebase-service-account.json
+   NO necesitas FIREBASE_PRIVATE_KEY ni FIREBASE_CLIENT_EMAIL si usas el JSON.
+6. Agrega la API Key y el API Secret NUEVOS de Cloudinary en .env.local.
+7. Cambia el PIN de operador y registra el nuevo en .env.local.
+8. Ejecuta en la terminal:
+   npm install
+   npm run check:firebase
+   npm run dev
+9. Abre http://localhost:3000/wall y prueba una foto en /camera.
+
+No coloques la clave privada ni Cloudinary API Secret en el navegador, GitHub, chat o ZIP.

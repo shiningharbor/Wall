@@ -1,0 +1,17 @@
+node_modules/
+.next/
+out/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.tsbuildinfo
+legacy-captures/
+assets/captures/
+.vercel/
+
+# JAMÁS versionar las claves de servicio
+secrets/
+*firebase-adminsdk*.json
+firebase-service-account.json
+service-account.json

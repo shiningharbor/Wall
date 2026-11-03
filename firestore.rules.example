@@ -1,0 +1,11 @@
+// INTEGRA esta sección en las reglas existentes de tu proyecto Firebase.
+// No sobrescribas otras reglas si "revolverx-50c19" aloja más aplicaciones.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // El muro se administra únicamente con Firebase Admin SDK (servidor Next.js).
+    match /photoWalls/{wallId} {
+      allow read, write: if false;
+    }
+  }
+}
