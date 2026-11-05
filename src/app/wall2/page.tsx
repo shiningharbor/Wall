@@ -49,27 +49,20 @@ export default function PhotoWall() {
   return (
     <main className="wall-screen wall2-screen">
       {/*
-        El lienzo original del muro es 100 × 350 (proporción 2:7).
-        preserveAspectRatio="none" lo estira a TODO el ancho y alto de la
-        pantalla, sin conservar la proporción. Al colocar el muro COMPLETO
-        dentro de foreignObject también se estiran marcos, fotos y fondo.
+        WALL 2 a resolución nativa: el fondo y las fotos se dibujan ya
+        al tamaño final de la pantalla. Mantiene la deformación horizontal
+        y vertical de toda la composición, pero evita que el navegador
+        rasterice primero un SVG estrecho y después lo amplíe.
       */}
-      <svg
-        className="wall2-stretch"
-        viewBox="0 0 1000 3500"
-        preserveAspectRatio="none"
-        aria-label="Muro fotográfico Roche Oncology adaptable a pantalla completa"
-      >
-        <foreignObject x="0" y="0" width="1000" height="3500">
-          <section className="photo-wall wall2-photo-wall" aria-label="Collage de fotografías Roche Oncology">
-            <div className="wall-grid">
-              {data.images.map((url, index) => (
-                <PhotoSlot key={index} url={url} />
-              ))}
-            </div>
-          </section>
-        </foreignObject>
-      </svg>
+      <div className="wall2-stretch">
+        <section className="photo-wall wall2-photo-wall" aria-label="Collage de fotografías Roche Oncology">
+          <div className="wall-grid">
+            {data.images.map((url, index) => (
+              <PhotoSlot key={index} url={url} />
+            ))}
+          </div>
+        </section>
+      </div>
       {debug && (
         <aside className="wall-debug" role="status">
           {error ? `Error: ${error}` : `Fotos: ${data.libraryCount} | Última rotación: ${data.lastRandomAt
