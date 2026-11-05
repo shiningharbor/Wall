@@ -1,8 +1,8 @@
 # Roche Oncology — Photo Wall (Next.js + Firebase + Cloudinary)
 
-**Versión adaptada:** las fotografías residen en **Cloudinary**; el catálogo y la rotación sincronizada de las 10 posiciones residen en **Firebase Cloud Firestore**. No se usa Redis, PHP ni almacenamiento local persistente.
+**Versión adaptada:** las fotografías residen en **Cloudinary**; el catálogo y la rotación sincronizada de las 10 posiciones residen en **Firebase Cloud Firestore**. No se usa Redis, PHP ni almacenamiento local persistente. El **Wall principal (`/wall`) muestra ahora 5 fotografías**, mientras que **Wall 2 (`/wall2`) conserva 10** con el estiramiento y la nitidez ya aprobados.
 
-La interfaz y las medidas del proyecto original se conservan: muro vertical de 100 × 350 cm (proporción 2:7), diez marcos, 5 formatos, cámara frontal espejo con foto JPEG 1400×1400, guía de recorte, refresco cada 4 segundos, protección de las dos fotos más nuevas y cambios aleatorios cada 12 segundos. No se modificaron sus estilos ni la composición.
+Se conserva el muro vertical de 100 × 350 cm (proporción 2:7), la cámara frontal espejo con foto JPEG 1400×1400, la guía de recorte, el refresco cada 4 segundos, la protección de las dos fotos más nuevas y los cambios aleatorios cada 12 segundos. El Wall principal usa un collage de 5 imágenes (2 + 1 + 2); Wall 2 sigue usando 10 imágenes, sin cambios en su diseño.
 
 ## Arquitectura
 
@@ -14,7 +14,7 @@ Tablet /camera ── POST /api/upload ── Next.js (servidor)
 Pantalla /wall ── GET /api/wall ───── Next.js (servidor)
                                       └─> Firestore (transacción de rotación)
                                        
-Todas las pantallas reciben la misma distribución de fotos.
+Wall 2 recibe las 10 posiciones originales. El Wall principal obtiene una selección de 5 de esas fotos, priorizando las dos capturas más recientes y rotando las otras tres; ambas vistas comparten el estado de Firestore.
 ```
 
 **Seguridad:** las rutas de Next.js acceden a Firestore con **Firebase Admin SDK** y a Cloudinary con variables de entorno privadas. El navegador no obtiene el secreto de Cloudinary ni la cuenta de servicio de Firebase. `/camera` requiere `UPLOAD_PIN`; `/wall` y las URLs de las fotos son públicas, apropiadas para una pantalla de evento siempre que exista consentimiento para mostrar las imágenes.
@@ -75,9 +75,11 @@ npm run dev
 Abre `http://localhost:3000`:
 
 - `/camera` — tablet fotográfica con PIN.
-- `/wall` — muro vertical.
+- `/wall` — muro vertical principal con 5 fotografías.
 - `/wall?debug=1` — diagnóstico de fotos y rotación.
-- `/api/wall` — respuesta JSON para diagnóstico.
+- `/wall2` — muro de 10 fotografías, deformación total a pantalla y mejor nitidez.
+- `/api/wall` — 10 fotos en JSON para Wall 2 y diagnóstico.
+- `/api/wall?view=primary` — 5 fotos en JSON para Wall principal.
 
 La cámara requiere `localhost` o **HTTPS** cuando se usa remotamente.
 

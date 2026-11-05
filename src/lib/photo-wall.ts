@@ -2,6 +2,7 @@ import { getAdminFirestore, WALL_DOCUMENT_PATH } from "@/lib/firebase-admin";
 import { parsePhotos } from "@/lib/photo-library";
 import {
   WALL_CAPACITY,
+  WALL_PRIMARY_CAPACITY,
   WALL_PROTECTED_NEWEST,
   WALL_RANDOM_MS,
   type Slot,
@@ -115,16 +116,44 @@ export function advanceWallState(
   return { state, changed };
 }
 
-function responseFromState(state: WallState, photos: StoredPhoto[]): WallResponse {
+// /wall conserva cinco fotos visibles; /wall2 conserva las diez originales.
+// Seleccionar las primeras cinco posiciones del estado de diez ocultaría capturas
+// nuevas cuando la API las colocase en las posiciones 6 a 10. En su lugar,
+// fijamos las dos más recientes y rotamos otras tres sin cambiar Firestore.
+function responseFromState(
+  state: WallState,
+  photos: StoredPhoto[],
+  view: "primary" | "full",
+): WallResponse {
   const urls = new Map(photos.map((photo) => [photo.id, photo.url]));
-  return {
-    images: state.slots.map((slot) => (slot && urls.get(slot.id)) || null),
-    libraryCount: photos.length,
-    lastRandomAt: state.lastRandomAt,
-  };
+  let images = state.slots.map((slot) => (slot && urls.get(slot.id)) || null);
+
+  if (view === "primary") {
+    const available = state.slots.flatMap((slot, index) =>
+      slot && urls.has(slot.id) ? [{ slot, index }] : [],
+    );
+    // Ya están protegidas en la rotación principal; se muestran siempre.
+    const recent = [...available]
+      .sort((a, b) => b.slot.order - a.slot.order)
+      .slice(0, Math.min(WALL_PROTECTED_NEWEST, WALL_PRIMARY_CAPACITY));
+    const recentIndices = new Set(recent.map(({ index }) => index));
+    const candidates = available.filter(({ index }) => !recentIndices.has(index));
+    // Índice estable durante cada ventana de rotación (evita parpadeos cada 4 s).
+    const offset = candidates.length
+      ? Math.floor(state.lastRandomAt / WALL_RANDOM_MS) % candidates.length
+      : 0;
+    const rotating = [...candidates.slice(offset), ...candidates.slice(0, offset)];
+    const visible = [...recent, ...rotating].slice(0, WALL_PRIMARY_CAPACITY);
+    images = Array.from({ length: WALL_PRIMARY_CAPACITY }, (_, index) => {
+      const slot = visible[index]?.slot;
+      return slot ? urls.get(slot.id) ?? null : null;
+    });
+  }
+
+  return { images, libraryCount: photos.length, lastRandomAt: state.lastRandomAt };
 }
 
-export async function getWallSnapshot(): Promise<WallResponse> {
+export async function getWallSnapshot(view: "primary" | "full" = "full"): Promise<WallResponse> {
   const db = getAdminFirestore();
   const ref = db.doc(WALL_DOCUMENT_PATH);
 
@@ -141,6 +170,6 @@ export async function getWallSnapshot(): Promise<WallResponse> {
     if (changed) {
       transaction.set(ref, { state }, { merge: true });
     }
-    return responseFromState(state, photos);
+    return responseFromState(state, photos, view);
   });
 }
