@@ -400,8 +400,9 @@ export default function CameraStudio() {
           ) : (
             <>
               <p className="framing-tip">
-                Mantén los rostros dentro del rectángulo horizontal: protege los recortes
-                de las fotos grandes y las pequeñas del nuevo muro.
+                Centra los rostros dentro de la guía vertical. En el muro de 5 fotos,
+                los cuatro marcos laterales recortan los lados de la imagen; la foto
+                original se sigue guardando completa en formato cuadrado.
               </p>
               <div className="camera-controls">
                 <button className="camera-switch" type="button" onClick={switchCamera}

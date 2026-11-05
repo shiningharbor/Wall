@@ -81,7 +81,7 @@ Abre `http://localhost:3000`:
 - `/api/wall` — 10 fotos en JSON para Wall 2 y diagnóstico.
 - `/api/wall?view=primary` — 5 fotos en JSON para Wall principal.
 
-La cámara requiere `localhost` o **HTTPS** cuando se usa remotamente.
+La cámara requiere `localhost` o **HTTPS** cuando se usa remotamente. La **zona segura del visor de `/camera`** está adaptada al Wall principal de cinco fotos: guía vertical centrada (44 % de ancho × 76 % de alto) para proteger rostros en los cuatro marcos estrechos. La captura original continúa siendo cuadrada, 1400 × 1400 px; la guía no se guarda en el JPG. Véase `CAMBIOS_ZONA_SEGURA_CAMARA.md`.
 
 ## 5. Recuperar el fondo aprobado
 

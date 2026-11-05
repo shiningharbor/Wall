@@ -6,20 +6,24 @@
   padding-bottom: max(22px, env(safe-area-inset-bottom));
 }
 
-/* El nuevo muro contiene dos fotos anchas. Con el source cuadrado y
-   object-position 50% 38% quedan visibles aprox. las alturas 16%-73%
-   en el marco mas apaisado. Esta guia deja margen adicional: 20%-69%. */
+/* /wall ahora utiliza cinco fotos: dos marcos verticales arriba,
+   una foto central y dos marcos verticales abajo (2 + 1 + 2).
+   Las cuatro fotos de los lados muestran aprox. el 51 % central del
+   ancho de una captura cuadrada (object-fit: cover), sin recortar alto.
+   Esta guia vertical de 44 % de ancho deja margen lateral para que
+   los rostros no se corten en ninguno de los cinco marcos.
+   Solo orienta la toma: no queda impresa en el JPG de 1400 x 1400. */
 .studio .safe-zone {
-  top: 20%;
-  left: 11%;
-  width: 78%;
-  height: 49%;
+  top: 12%;
+  left: 28%;
+  width: 44%;
+  height: 76%;
   aspect-ratio: auto;
   transform: none;
 }
-.studio .safe-zone::before { height: 18%; }
-.studio .safe-zone::after { width: 18%; }
-.studio .safe-label { font-size: clamp(9px, 2vw, 11px); }
+.studio .safe-zone::before { height: 11%; }
+.studio .safe-zone::after { width: 22%; }
+.studio .safe-label { font-size: clamp(9px, 2vw, 11px); padding: 4px 6px; transform: translate(-50%, -2px); }
 
 .camera-login {
   width: min(100%, 380px);
